@@ -276,7 +276,7 @@ function step(p,i,dt){
 })();
 
 
-function loop(now){if(hiddenPaused)return;const frameGap=now-lastFrame;if(autoEco&&quality==='medium'&&frameGap>42)quality='low';lastFrame=now;
+function loop(now){if(hiddenPaused)return;const frameGap=now-lastFrame;if(autoEco&&quality==='medium'&&frameGap>42)applyQuality('low');lastFrame=now;
  const dt=Math.min((now-(loop.l||now))/1000,.05);loop.l=now;
  playerIndices().forEach(i=>step(P[i],i,dt));
   ecoAcc+=dt;const simStep=quality==='low'?.06:quality==='medium'?.033:.016;const runSim=ecoAcc>=simStep;if(runSim)ecoAcc=0;
