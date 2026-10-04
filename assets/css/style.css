@@ -40,3 +40,93 @@ canvas{display:block;position:fixed;inset:0;width:100%;height:100%}
 /* v2 performance controls */
 #settingsPanel button.active{outline:2px solid var(--ok)}
 .settingsPanel .row{display:flex;gap:6px;flex-wrap:wrap}
+
+/* iOS-inspired game redesign */
+:root{
+ --ios-bg:rgba(18,18,20,.72);
+ --ios-glass:rgba(255,255,255,.14);
+ --ios-glass-strong:rgba(255,255,255,.22);
+ --ios-line:rgba(255,255,255,.18);
+ --ios-white:#fff;
+ --ios-muted:rgba(255,255,255,.72);
+ --ios-gold:#f5c451;
+}
+html,body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Cairo",sans-serif}
+#ov{
+ padding:max(22px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));
+ background:linear-gradient(180deg,rgba(8,8,10,.28),rgba(8,8,10,.76));
+ backdrop-filter:blur(10px) saturate(115%);-webkit-backdrop-filter:blur(10px);
+ gap:16px
+}
+#ov h1{font-size:clamp(32px,7vw,58px);letter-spacing:-1.8px;text-shadow:0 3px 18px rgba(0,0,0,.32);margin:0 0 2px}
+#ov h1::after{content:"رحلة تعليمية في قلب الصحراء";display:block;margin-top:4px;font-size:clamp(13px,2.5vw,17px);font-weight:700;letter-spacing:0;color:rgba(255,255,255,.72)}
+.modeBtns{
+ width:min(760px,94vw);max-width:none;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+ animation:none
+}
+.modeBtns button{
+ min-height:92px;position:relative;overflow:hidden;border:1px solid var(--ios-line);
+ border-radius:24px;padding:14px 10px 12px;background:var(--ios-glass);color:#fff;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 10px 30px rgba(0,0,0,.16);
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+ font:800 16px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Display","Cairo",sans-serif;
+ transition:transform .18s ease,background .18s ease,border-color .18s ease
+}
+.modeBtns button::before{display:block;font-size:30px;line-height:1;margin-bottom:7px}
+#modeF::before{content:"🧑🏻"}
+#modeZ::before{content:"🧑🏽"}
+#mode2::before{content:"👬"}
+.modeBtns button.sel{
+ background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,.13));
+ border-color:rgba(255,255,255,.65);outline:3px solid rgba(245,196,81,.9);outline-offset:2px;
+ transform:translateY(-3px)
+}
+.modeBtns button:active{transform:scale(.97)}
+.modeBtns button.sel::after{content:"✓";position:absolute;top:8px;left:10px;width:25px;height:25px;border-radius:50%;background:var(--ios-gold);color:#3a2600;font-size:16px;line-height:25px}
+.modeHint{font-size:14px;color:var(--ios-muted);font-weight:700}
+.help{
+ width:min(700px,94vw);max-width:none;background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.12);
+ border-radius:18px;padding:2px 12px;color:#fff
+}
+.help summary{font-size:14px;padding:9px}.help p{font-size:13px;line-height:1.8;color:rgba(255,255,255,.78)}
+#go{
+ min-width:min(360px,86vw);min-height:54px;padding:0 28px;border-radius:17px;
+ background:linear-gradient(180deg,#35c759,#22a943);box-shadow:0 9px 24px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.35);
+ font:800 19px -apple-system,BlinkMacSystemFont,"SF Pro Display","Cairo",sans-serif
+}
+.gameCtl,.zoomCtl button,.diraPanel button,.settingsPanel button{
+ border:1px solid rgba(255,255,255,.18)!important;background:rgba(28,28,30,.72)!important;color:#fff!important;
+ box-shadow:0 7px 22px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.12)!important;
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)
+}
+.gameCtl{min-height:44px;border-radius:14px!important;padding:8px 14px!important}
+.zoomCtl button{width:48px;height:48px;border-radius:15px!important}
+#tm{
+ border:1px solid rgba(255,255,255,.22);background:rgba(28,28,30,.68);color:#fff;
+ box-shadow:0 7px 22px rgba(0,0,0,.2);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)
+}
+.settingsPanel{
+ top:160px;width:min(300px,calc(100vw - 24px));border:1px solid rgba(255,255,255,.16);
+ background:rgba(28,28,30,.88);color:#fff;box-shadow:0 18px 50px rgba(0,0,0,.35);
+ backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:20px;padding:14px
+}
+.settingsPanel button{min-height:44px;border-radius:12px!important;font-size:13px!important}
+.settingsPanel small{color:rgba(255,255,255,.65)}
+.diraPanel button{min-height:44px;border-radius:14px!important}
+.sc,.tt,.q{
+ box-shadow:0 7px 20px rgba(0,0,0,.18);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)
+}
+.q{border:1px solid rgba(255,255,255,.2)!important;background:rgba(28,28,30,.86)}
+.q button{min-width:56px;min-height:48px}
+.joy{box-shadow:0 10px 30px rgba(0,0,0,.2);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+@media(max-width:700px){
+ #ov{justify-content:center;gap:13px}
+ .modeBtns{grid-template-columns:1fr;max-width:360px}
+ .modeBtns button{min-height:68px;padding:10px 18px;text-align:right;padding-right:62px}
+ .modeBtns button::before{position:absolute;right:18px;top:18px;font-size:28px}
+ .modeBtns button.sel::after{left:auto;right:10px;top:8px}
+ #go{min-height:52px}
+}
+@media(prefers-reduced-motion:reduce){
+ #ov h1,.settingsPanel.open{animation:none!important}.modeBtns button{transition:none}
+}
