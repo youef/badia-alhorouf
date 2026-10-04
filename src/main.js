@@ -1,1 +1,0 @@
-import('./ui.js').then(m=>m.mount()).catch(console.error);
