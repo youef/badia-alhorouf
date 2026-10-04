@@ -371,13 +371,14 @@ requestAnimationFrame(loop);
 /* ===== اختيار الشخصيات + التبديل + الزوم + الخريطة + الأداء ===== */
 (function(){
   const modeF=$('modeF'),modeZ=$('modeZ'),mode2=$('mode2'),hint=$('modeHint');
-  function setMode(m){m=normalizeMode(m);gameMode=m;gameStore.save({mode:m,activePlayer});if(m!=='two') activePlayer=m==='f'?0:1;
-    [modeF,modeZ,mode2].forEach(b=>b.classList.remove('sel'));
-    (m==='f'?modeF:m==='z'?modeZ:mode2).classList.add('sel');
+  function setMode(m){m=normalizeMode(m);gameMode=m;if(m!=='two') activePlayer=m==='f'?0:1;gameStore.save({mode:m,activePlayer});
+    [modeF,modeZ,mode2].forEach(b=>{b.classList.remove('sel');b.setAttribute('aria-pressed','false');});
+    const chosen=m==='f'?modeF:m==='z'?modeZ:mode2;chosen.classList.add('sel');chosen.setAttribute('aria-pressed','true');
     hint.textContent=m==='two'?'شخصيتان على نفس الجهاز — فواز وزياد':m==='f'?'تلعب بفواز على الشاشة كاملة — اضغط 🔄 للتبديل':'تلعب بزياد على الشاشة كاملة — اضغط 🔄 للتبديل';
     layout();
   }
-  modeF.onclick=(e)=>{e.preventDefault();setMode('f')};modeZ.onclick=(e)=>{e.preventDefault();setMode('z')};mode2.onclick=(e)=>{e.preventDefault();setMode('two')};
+  const chooseMode=e=>{e.preventDefault();e.stopPropagation();const m=e.currentTarget===modeF?'f':e.currentTarget===modeZ?'z':'two';setMode(m);};
+  [modeF,modeZ,mode2].forEach(b=>{b.type='button';b.addEventListener('pointerdown',chooseMode);b.addEventListener('click',chooseMode);});
   $('go').onclick=()=>{ $('ov').style.display='none'; $('switchPlayer').style.display='block'; $('soundToggle').style.display='block'; $('zoomCtl').style.display='flex'; $('miniMap').style.display='none'; $('diraPanel').style.display='none'; layout(); ac&&ac.resume(); beep(600,.15); persistGame&&persistGame(); setTimeout(()=>{if(uiMapOn)$('miniMap').style.display='block';$('diraPanel').style.display='flex';},7000); };
   $('switchPlayer').onclick=()=>{if(gameMode==='two'){toast(0,'وضع شخصيتين: فواز وزياد يعملان معًا 👥');return;}activePlayer=activePlayer?0:1;layout();toast(activePlayer,'الآن تلعب بـ '+(activePlayer?'زياد 🔵':'فواز 🔴'));};
    $('settingsToggle').onclick=()=>{$('settingsPanel').classList.toggle('open');};
