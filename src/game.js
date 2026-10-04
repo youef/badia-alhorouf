@@ -348,9 +348,9 @@ function xa(i){const p=P[i],a=[{x:DX,z:DZ+3,r:6,l:'اجلس بالديوان �
  return a;}
 function v2(dt,now){
  P.forEach(p=>{if(p.sit&&!p.busy&&(Math.hypot(p.jx,p.jz)>.6||keys[p.k.l]||keys[p.k.r]||keys[p.k.u]||keys[p.k.d]))p.sit=false;});
- if(!effectsOn)return;talkT-=dt;if(talkT<=0){talkT=8+R()*5;say(pick(sheikhs.concat([crowd[0],crowd[1]])),pick(LN));}
- sT-=dt;if(sT<=0){sT=3.5;P.forEach((p,i)=>{if(near(p.g.position,{x:flocks[i].c.x,z:flocks[i].c.z},14)&&R()<.7)snd('baa');if(p.fire&&near(p.g.position,{x:FP[i][0],z:FP[i][1]},14))snd('crackle');});if(dayI(tod)<.5&&R()<.6)snd('cricket');}
- df.scale.y=.8+R()*.5;fam.forEach((c,i)=>{if(c.bs<.6)c.g.position.y=Math.abs(Math.sin(now/300+i))*.4;else c.g.rotation.y=.5+Math.sin(now/1500+i)*.3;});
+ if(effectsOn){talkT-=dt;if(talkT<=0){talkT=8+R()*5;say(pick(sheikhs.concat([crowd[0],crowd[1]])),pick(LN));}
+  sT-=dt;if(sT<=0){sT=3.5;P.forEach((p,i)=>{if(near(p.g.position,{x:flocks[i].c.x,z:flocks[i].c.z},14)&&R()<.7)snd('baa');if(p.fire&&near(p.g.position,{x:FP[i][0],z:FP[i][1]},14))snd('crackle');});if(dayI(tod)<.5&&R()<.6)snd('cricket');}
+  df.scale.y=.8+R()*.5;fam.forEach((c,i)=>{if(c.bs<.6)c.g.position.y=Math.abs(Math.sin(now/300+i))*.4;else c.g.rotation.y=.5+Math.sin(now/1500+i)*.3;});}
  an.forEach(a=>{const q=a.g.position;let fx=0,fz=0;const RR=a.k=='j'?9:7;
   kd.map(c=>c.g.position).concat(P.map(p=>p.g.position)).forEach(o=>{const ex=q.x-o.x,ez=q.z-o.z,d=Math.hypot(ex,ez)||.1;if(d<RR){fx+=ex/d*(RR-d);fz+=ez/d*(RR-d);}});
   let dx,dz,v;const l=Math.hypot(fx,fz);if(l>.1){dx=fx/l;dz=fz/l;v=a.k=='j'?9:6;}else{a.wa+=(R()-.5)*dt*3;dx=Math.cos(a.wa);dz=Math.sin(a.wa);v=1.2;}
