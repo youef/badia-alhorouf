@@ -148,6 +148,9 @@ function loop(now){
   const oldXa = xa;
   const money = [80,80], herd = [0,0], camels = [0,0], horsesOwned = [0,0];
   const meal = [0,0], raw = [0,0], campsBuilt = [0,0];
+  const savedEconomy=profileState.economy||[];
+  savedEconomy.forEach((e,i)=>{if(!e)return;money[i]=Number(e.money)||money[i];herd[i]=Number(e.herd)||0;camels[i]=Number(e.camels)||0;horsesOwned[i]=Number(e.horses)||0;meal[i]=Number(e.meal)||0;raw[i]=Number(e.raw)||0;campsBuilt[i]=Number(e.camps)||0;});
+  window.badiaEconomy={money,herd,camels,horsesOwned,meal,raw,campsBuilt};
   const wife = [null,null];
 
   function makeCamel(){
@@ -362,14 +365,14 @@ requestAnimationFrame(loop);
 /* ===== اختيار الشخصيات + التبديل + الزوم + الخريطة + الأداء ===== */
 (function(){
   const modeF=$('modeF'),modeZ=$('modeZ'),mode2=$('mode2'),hint=$('modeHint');
-  function setMode(m){m=normalizeMode(m);gameMode=m;gameStore.setMode(m);if(m!=='two') activePlayer=m==='f'?0:1;
+  function setMode(m){m=normalizeMode(m);gameMode=m;gameStore.save({mode:m,activePlayer});if(m!=='two') activePlayer=m==='f'?0:1;
     [modeF,modeZ,mode2].forEach(b=>b.classList.remove('sel'));
     (m==='f'?modeF:m==='z'?modeZ:mode2).classList.add('sel');
     hint.textContent=m==='two'?'شخصيتان على نفس الجهاز — فواز وزياد':m==='f'?'تلعب بفواز على الشاشة كاملة — اضغط 🔄 للتبديل':'تلعب بزياد على الشاشة كاملة — اضغط 🔄 للتبديل';
     layout();
   }
   modeF.onclick=(e)=>{e.preventDefault();setMode('f')};modeZ.onclick=(e)=>{e.preventDefault();setMode('z')};mode2.onclick=(e)=>{e.preventDefault();setMode('two')};
-  $('go').onclick=()=>{ $('ov').style.display='none'; $('switchPlayer').style.display='block'; $('soundToggle').style.display='block'; $('zoomCtl').style.display='flex'; $('miniMap').style.display='block'; layout(); ac&&ac.resume(); beep(600,.15); };
+  $('go').onclick=()=>{ $('ov').style.display='none'; $('switchPlayer').style.display='block'; $('soundToggle').style.display='block'; $('zoomCtl').style.display='flex'; $('miniMap').style.display='block'; $('diraPanel').style.display='flex'; layout(); ac&&ac.resume(); beep(600,.15); persistGame&&persistGame(); };
   $('switchPlayer').onclick=()=>{if(gameMode==='two'){toast(0,'وضع شخصيتين: فواز وزياد يعملان معًا 👥');return;}activePlayer=activePlayer?0:1;layout();toast(activePlayer,'الآن تلعب بـ '+(activePlayer?'زياد 🔵':'فواز 🔴'));};
   $('soundToggle').onclick=()=>{soundsOn=!soundsOn;$('soundToggle').textContent=soundsOn?'🔊 الصوت':'🔇 صامت';if(soundsOn){ac&&ac.resume();beep(700,.1);}};
   $('zoomIn').onclick=()=>{const ids=playerIndices();ids.forEach(i=>zoom[i]=Math.max(.65,Math.min(1.8,zoom[i]-.12)));};
@@ -394,5 +397,5 @@ requestAnimationFrame(loop);
 })();
 
 const buildings=new BuildingSystem({storageKey:'badia-buildings-v1',bounds:{minX:-82,maxX:82,minZ:-82,maxZ:82},sizes:{camp:8,majlis:7,sheepPen:7,camelPen:8,stable:9,palm:2.5,well:4}});
-function persistGame(){gameStore.save({mode:gameMode,activePlayer,profiles:P.map((p,i)=>({name:['فواز','زياد'][i],stars:p.st||0,water:p.jugs||0,coffee:p.cof||0,money:typeof money!=='undefined'?money[i]:80})),buildings:buildings.serialize()})}
+function persistGame(){const e=window.badiaEconomy||{};gameStore.save({mode:gameMode,activePlayer,profiles:P.map((p,i)=>({name:['فواز','زياد'][i],stars:p.st||0,water:p.jugs||0,coffee:p.cof||0})),economy:[0,1].map(i=>({money:e.money?.[i]??80,herd:e.herd?.[i]??0,camels:e.camels?.[i]??0,horses:e.horsesOwned?.[i]??0,meal:e.meal?.[i]??0,raw:e.raw?.[i]??0,camps:e.campsBuilt?.[i]??0})),buildings:buildings.serialize()})}
 setInterval(persistGame,15000);addEventListener('beforeunload',persistGame);document.querySelectorAll('[data-dira]').forEach(b=>b.addEventListener('click',()=>{const i=activePlayer;if(b.dataset.dira==='save'){persistGame();toast(i,'تم الحفظ 💾')}else if(b.dataset.dira==='build'){const x=P[i].g.position.x+Math.sin(P[i].ang)*6,z=P[i].g.position.z+Math.cos(P[i].ang)*6;const r=buildings.place('camp',x,z,{owner:i});toast(i,r.ok?'تم بناء المخيم 🏕️':r.reason)}else toast(i,b.dataset.dira==='market'?'السوق مرتبط بملف الشخصية 🛒':'المطبخ مرتبط بمسار الغنم 🍲')}));
