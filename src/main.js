@@ -1,0 +1,1 @@
+document.querySelector('#startBtn').onclick=()=>alert('جاهز');
