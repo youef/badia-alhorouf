@@ -27,12 +27,12 @@ canvas{display:block;position:fixed;inset:0;width:100%;height:100%}
 #dv{position:fixed;background:#fff;opacity:.9}
 #ov{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(40,25,10,.72);color:#fff;text-align:center;padding:20px}
 #ov h1{font-size:36px;margin:0}#ov p{margin:0;font-size:17px;line-height:1.9;max-width:560px;font-weight:600}
-#go{font:800 22px Cairo,Tahoma,sans-serif;padding:10px 38px;border:0;border-radius:99px;background:var(--ok);color:#fff}
+#go{font:800 22px Cairo,Tahoma,sans-serif;padding:10px 38px;border:0;border-radius:99px;background:var(--ok);color:#fff}.modeBtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:560px}.modeBtns button,.gameCtl{font:800 15px Cairo,Tahoma,sans-serif;border:0;border-radius:16px;padding:8px 14px;background:var(--card);color:var(--ink)}.modeBtns button.sel{outline:4px solid #f0c14b}.gameCtl{position:fixed;z-index:20;top:70px;right:10px;pointer-events:auto}.gameCtl.left{right:auto;left:10px}.zoomCtl{position:fixed;z-index:20;right:10px;bottom:12px;display:flex;gap:6px;pointer-events:auto}.zoomCtl button{width:46px;height:46px;border:0;border-radius:14px;background:var(--card);color:var(--ink);font:800 24px Cairo}.soundCtl{position:fixed;z-index:20;left:10px;top:70px;pointer-events:auto}.mapCtl{position:fixed;z-index:20;left:10px;top:112px;width:120px;height:120px;border:3px solid var(--ink);border-radius:16px;background:rgba(255,248,232,.88);pointer-events:none}.modeHint{font-size:14px;opacity:.9}
 </style>
 </head>
 <body>
-<div id="dv"></div><div id="tm">☀️ نهار</div>
-<div id="ov"><h1>بادية الحروف 🐪</h1><p>أنتما فواز 🔴 وزياد 🔵 في البادية. تعلّما الحروف والكلمات والأرقام وأنتما تعيشان: اسقيا الغنم من البئر، وأشعلا النار، واصنعا القهوة، وانتظرا العشاء ثم نامان، وزورا ديوان الشيخ، وسابقا الخيل، وصيدا بالمقلاع والصقر، واستقبلا الضيوف.<br>اقترب من أي شيء وسيظهر زر التفاعل.<br>فواز: W A S D و E · زياد: الأسهم و Enter · اختيار الإجابة بلمسها</p><button id="go">ابدأ</button></div>
+<div id="dv"></div><div id="tm">☀️ نهار</div><button id="switchPlayer" class="gameCtl" style="display:none">🔄 تبديل الشخصية</button><button id="soundToggle" class="gameCtl left" style="display:none">🔊 الصوت</button><div class="zoomCtl" id="zoomCtl" style="display:none"><button id="zoomOut">−</button><button id="zoomReset">1×</button><button id="zoomIn">+</button></div><canvas id="miniMap" class="mapCtl" width="240" height="240" style="display:none"></canvas>
+<div id="ov"><h1>بادية الحروف 🐪</h1><div class="modeBtns"><button id="modeF">🔴 فواز فقط</button><button id="modeZ">🔵 زياد فقط</button><button id="mode2" class="sel">👥 فواز + زياد</button></div><div class="modeHint" id="modeHint">شخصيتان على نفس الجهاز</div><p>أنتما فواز 🔴 وزياد 🔵 في البادية. تعلّما الحروف والكلمات والأرقام وأنتما تعيشان: اسقيا الغنم من البئر، وأشعلا النار، واصنعا القهوة، وانتظرا العشاء ثم نامان، وزورا ديوان الشيخ، وسابقا الخيل، وصيدا بالمقلاع والصقر، واستقبلا الضيوف.<br>اقترب من أي شيء وسيظهر زر التفاعل.<br>فواز: W A S D و E · زياد: الأسهم و Enter · اختيار الإجابة بلمسها</p><button id="go">ابدأ</button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const $=id=>document.getElementById(id),R=Math.random,AR=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]),sh=a=>a.map(v=>[R(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
@@ -145,16 +145,16 @@ function acts(i){const p=P[i],f=flocks[i];let cx=0,cz=0;f.sheep.forEach(s=>{cx+=
  ...xa(i)];}
 let tod=0.02,ac;function beep(f,d=.12){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain(),n=ac.currentTime;o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.12,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(g);g.connect(ac.destination);o.start(n);o.stop(n+d);}catch(e){}}
 // input
-const keys={},DK=[['Digit1','Digit2','Digit3','Digit4'],['Digit7','Digit8','Digit9','Digit0']];
-addEventListener('keydown',e=>{keys[e.code]=1;if(/Arrow|Space|Enter/.test(e.code))e.preventDefault();if(e.repeat)return;P.forEach((p,i)=>{if(e.code==p.k.a&&!p.busy)p.act=true;const k=DK[i].indexOf(e.code);if(p.busy&&k>=0){const b=$('q'+i).querySelectorAll('button')[k];b&&b.click();}});});
+let gameMode="two",activePlayer=0,soundsOn=true,zoom=[1,1];const playerIndices=()=>gameMode==="two"?[0,1]:[activePlayer];const keys={},DK=[['Digit1','Digit2','Digit3','Digit4'],['Digit7','Digit8','Digit9','Digit0']];
+addEventListener('keydown',e=>{keys[e.code]=1;if(e.code==='Tab'){e.preventDefault();if(gameMode!=='two'){activePlayer=activePlayer?0:1;layout();toast(activePlayer,'تم التبديل إلى '+(activePlayer?'زياد 🔵':'فواز 🔴'));}};if(/Arrow|Space|Enter/.test(e.code))e.preventDefault();if(e.repeat)return;P.forEach((p,i)=>{if(e.code==p.k.a&&!p.busy)p.act=true;const k=DK[i].indexOf(e.code);if(p.busy&&k>=0){const b=$('q'+i).querySelectorAll('button')[k];b&&b.click();}});});
 addEventListener('keyup',e=>keys[e.code]=0);document.addEventListener('gesturestart',e=>e.preventDefault());
 ['f','z'].forEach((c,i)=>{const d=document.createElement('div');d.className='pane '+c;d.id='pn'+i;d.innerHTML='<div class="sc" id="sc'+i+'"></div><div class="tt" id="tt'+i+'"></div><div class="q" id="q'+i+'"></div><div class="joy" id="j'+i+'"><i></i></div><button class="b" id="ab'+i+'">—</button>';document.body.append(d);
  const p=P[i],el=$('j'+i),kn=el.firstElementChild,mv=e=>{const r=el.getBoundingClientRect();let x=(e.clientX-r.left-56)/56,y=(e.clientY-r.top-56)/56;const l=Math.hypot(x,y);if(l>1){x/=l;y/=l;}p.jx=x;p.jz=y;kn.style.left=34+x*34+'px';kn.style.top=34+y*34+'px';};
  el.onpointerdown=e=>{el.setPointerCapture(e.pointerId);mv(e);};el.onpointermove=e=>{if(el.hasPointerCapture(e.pointerId))mv(e);};el.onpointerup=el.onpointercancel=()=>{p.jx=p.jz=0;kn.style.left=kn.style.top='34px';};
  $('ab'+i).onpointerdown=()=>{if(!p.busy)p.act=true;};hud(i);});
 $('go').onclick=e=>{e.target.blur();$('ov').style.display='none';ac&&ac.resume();beep(600,.15);};
-function rect(i){const W=innerWidth,H2=innerHeight;return W>=H2?{x:i?0:W/2,t:0,w:W/2,h:H2}:{x:0,t:i?H2/2:0,w:W,h:H2/2};}
-function layout(){const W=innerWidth,H2=innerHeight;ren.setSize(W,H2);P.forEach((p,i)=>{const v=rect(i),e=$('pn'+i).style;e.left=v.x+'px';e.top=v.t+'px';e.width=v.w+'px';e.height=v.h+'px';});
+function rect(i){const W=innerWidth,H2=innerHeight;if(gameMode!=='two')return{x:0,t:0,w:W,h:H2};return W>=H2?{x:i?0:W/2,t:0,w:W/2,h:H2}:{x:0,t:i?H2/2:0,w:W,h:H2/2};}
+function layout(){const W=innerWidth,H2=innerHeight;ren.setSize(W,H2);P.forEach((p,i)=>{const v=rect(i),e=$('pn'+i).style;e.display=gameMode==='two'||i===activePlayer?'block':'none';e.left=v.x+'px';e.top=v.t+'px';e.width=v.w+'px';e.height=v.h+'px';});
  const d=$('dv').style;if(W>=H2){d.left=W/2-2+'px';d.top=0;d.width='4px';d.height='100%';}else{d.left=0;d.top=H2/2-2+'px';d.width='100%';d.height='4px';}}
 addEventListener('resize',layout);layout();
 // day & night
@@ -303,7 +303,7 @@ function loop(now){
 })();
 
 requestAnimationFrame(loop);const dt=Math.min((now-(loop.l||now))/1000,.05);loop.l=now;
- P.forEach((p,i)=>step(p,i,dt));
+ playerIndices().forEach(i=>step(P[i],i,dt));
  tod=(tod+dt/150)%1;const di=dayI(tod),sk=skyAt(tod);scene.background=sk;scene.fog.color.copy(sk);hemi.intensity=.2+.65*di;dl.intensity=1.2*di;stars.visible=di<.6;
  const tl=tod<.55?'☀️ نهار':tod<.74?'🌅 مغرب':'🌙 ليل';if($('tm').textContent!=tl)$('tm').textContent=tl;
  for(let i=0;i<2;i++){const f=P[i].fire;flame[i].visible=f;fire[i].intensity=f?(.8+(1-di)*1.2)*(.9+R()*.2):0;if(f)flame[i].scale.y=.8+R()*.5;
@@ -315,7 +315,7 @@ requestAnimationFrame(loop);const dt=Math.min((now-(loop.l||now))/1000,.05);loop
   const x=-12*w.u,z=-31-7*w.u;w.p.g.position.set(x+(w.u>0&&w.u<1?0:0)+wm.indexOf(w)*1.3,0,z);w.p.g.rotation.y=Math.atan2(-12*w.dir,-7*w.dir);});
  crowd.forEach((c,i)=>{if(c.bs<.6)c.g.position.y=Math.abs(Math.sin(now/300+i))*.4;else if(!c.sit)c.g.rotation.y=Math.sin(now/1500+i)*.3;c.armL.rotation.x=c.sit?-.5:0;c.armR.rotation.x=c.sit?-.5:0;c.feet.visible=!c.sit;c.lap.visible=!!c.sit;});
  v2(dt,now);const H2=innerHeight;ren.setScissorTest(true);
- P.forEach((p,i)=>{const v=rect(i),q=(race.on&&race.gu[i]!=null)?hs[race.x.indexOf(Math.max(...race.x))].g.position:p.g.position,k=v.w/v.h<1.2?1.5:1;
+ playerIndices().forEach(i=>{const p=P[i],v=rect(i),q=(race.on&&race.gu[i]!=null)?hs[race.x.indexOf(Math.max(...race.x))].g.position:p.g.position,k=(v.w/v.h<1.2?1.5:1)*zoom[i];
   p.cp.lerp(new THREE.Vector3(q.x,6.5*k,q.z+9*k),.08);p.cl.lerp(new THREE.Vector3(q.x,1.5,q.z-1),.15);
   ren.setViewport(v.x,H2-v.t-v.h,v.w,v.h);ren.setScissor(v.x,H2-v.t-v.h,v.w,v.h);cam.aspect=v.w/v.h;cam.updateProjectionMatrix();cam.position.copy(p.cp);cam.lookAt(p.cl);ren.render(scene,cam);});
 }
@@ -323,10 +323,10 @@ requestAnimationFrame(loop);const dt=Math.min((now-(loop.l||now))/1000,.05);loop
 // ===== الجزء الثاني: ديوان، خيل، صيد، ضيف، أصوات =====
 const AC=()=>ac=ac||new(window.AudioContext||window.webkitAudioContext)(),V3=THREE.Vector3;
 function tn(f1,f2,d,ty,g,at){try{const a=AC(),o=a.createOscillator(),v=a.createGain(),n=a.currentTime+(at||0);o.type=ty;o.frequency.setValueAtTime(f1,n);o.frequency.linearRampToValueAtTime(f2,n+d);v.gain.setValueAtTime(g,n);v.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(v);v.connect(a.destination);o.start(n);o.stop(n+d);}catch(e){}}
-function snd(k){if(k=='baa'){tn(300,220,.55,'sawtooth',.05);tn(310,230,.55,'square',.02);}else if(k=='cry'){tn(2200,1100,.5,'sine',.1);tn(1800,900,.4,'sine',.08,.35);}else if(k=='hoof'){for(let j=0;j<24;j++)tn(110,60,.07,'triangle',.18,j*.11);}else if(k=='crackle'){for(let j=0;j<6;j++)tn(900+R()*900,200,.03,'square',.05,R()*.8);}else if(k=='cricket'){for(let j=0;j<6;j++)tn(4300,4300,.04,'square',.015,j*.09);}}
+function snd(k){if(!soundsOn)return;if(k=='baa'){tn(300,220,.55,'sawtooth',.05);tn(310,230,.55,'square',.02);}else if(k=='cry'){tn(2200,1100,.5,'sine',.1);tn(1800,900,.4,'sine',.08,.35);}else if(k=='hoof'){for(let j=0;j<24;j++)tn(110,60,.07,'triangle',.18,j*.11);}else if(k=='crackle'){for(let j=0;j<6;j++)tn(900+R()*900,200,.03,'square',.05,R()*.8);}else if(k=='cricket'){for(let j=0;j<6;j++)tn(4300,4300,.04,'square',.015,j*.09);}}
 function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang='ar-SA';u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
 const near=(a,b,r)=>Math.hypot(a.x-b.x,a.z-b.z)<r;
-function say(p,t){const b=label(t,'#5a3a1a');b.scale.set(6,1.9,1);b.position.y=3.8;if(p.bub)p.g.remove(p.bub);p.g.add(b);p.bub=b;setTimeout(()=>{if(p.bub==b){p.g.remove(b);p.bub=null;}},3600);if(P.some(q=>near(q.g.position,p.g.position,18)))speak(t);}
+function say(p,t){const b=label(t,'#5a3a1a');b.scale.set(6,1.9,1);b.position.y=3.8;if(p.bub)p.g.remove(p.bub);p.g.add(b);p.bub=b;setTimeout(()=>{if(p.bub==b){p.g.remove(b);p.bub=null;}},3600);if(soundsOn&&P.some(q=>near(q.g.position,p.g.position,18)))speak(t);}
 const LN=['يا هلا والله بالضيوف','صبّ القهوة يا ولد','الربيع هالسنة خير والفقع كثير','الصقر الحر ما ياكل إلا من صيده','سقّوا الغنم قبل المغرب','الله يحييكم ما جيتوا إلا على خير','البادية مدرسة يا عيال','حيّا الله من جانا'];
 function sign(x,z,t,c){const g=new THREE.Group();M(new THREE.CylinderGeometry(.12,.12,4,6),S(0x6b4a2a),0,2,0,g);const l=label(t,c);l.scale.set(6.4,2.2,1);l.position.y=4.6;g.add(l);g.position.set(x,0,z);scene.add(cast(g));}
 sign(13,9,'مخيم فواز','#c8102e');sign(-13,9,'مخيم زياد','#1769c2');sign(40,-33,'مخيم عائلة أبو خالد','#7a4a1a');sign(DX,DZ+7,'ديوان الشيخ سالم','#1f6b43');sign(-8,-33,'بئر الماء والحريم','#555');sign(-27,58,'ميدان الخيل','#6b2a2a');sign(60,17,'ميدان الصيد','#2a4a6b');
@@ -391,6 +391,43 @@ function v2(dt,now){
   else if(race.on==2){race.cd-=dt;hs.forEach(h=>h.legs.forEach(l=>l.rotation.x=0));if(race.cd<0){race.on=0;race.gu=[null,null];race.x=[0,0,0];hs.forEach((h,k)=>h.g.position.set(-22,0,60+k*4));}}}
  guestUpd(dt);}
 requestAnimationFrame(loop);
+
+/* ===== اختيار الشخصيات + التبديل + الزوم + الخريطة + الأداء ===== */
+(function(){
+  const modeF=$('modeF'),modeZ=$('modeZ'),mode2=$('mode2'),hint=$('modeHint');
+  function setMode(m){
+    gameMode=m;
+    if(m!=='two') activePlayer=m==='f'?0:1;
+    [modeF,modeZ,mode2].forEach(b=>b.classList.remove('sel'));
+    (m==='f'?modeF:m==='z'?modeZ:mode2).classList.add('sel');
+    hint.textContent=m==='two'?'شخصيتان على نفس الجهاز — فواز وزياد':m==='f'?'تلعب بفواز على الشاشة كاملة — اضغط 🔄 للتبديل':'تلعب بزياد على الشاشة كاملة — اضغط 🔄 للتبديل';
+    layout();
+  }
+  modeF.onclick=()=>setMode('f');modeZ.onclick=()=>setMode('z');mode2.onclick=()=>setMode('two');
+  $('go').onclick=()=>{ $('ov').style.display='none'; $('switchPlayer').style.display='block'; $('soundToggle').style.display='block'; $('zoomCtl').style.display='flex'; $('miniMap').style.display='block'; layout(); ac&&ac.resume(); beep(600,.15); };
+  $('switchPlayer').onclick=()=>{if(gameMode==='two'){toast(0,'وضع شخصيتين: فواز وزياد يعملان معًا 👥');return;}activePlayer=activePlayer?0:1;layout();toast(activePlayer,'الآن تلعب بـ '+(activePlayer?'زياد 🔵':'فواز 🔴'));};
+  $('soundToggle').onclick=()=>{soundsOn=!soundsOn;$('soundToggle').textContent=soundsOn?'🔊 الصوت':'🔇 صامت';if(soundsOn){ac&&ac.resume();beep(700,.1);}};
+  $('zoomIn').onclick=()=>{const ids=playerIndices();ids.forEach(i=>zoom[i]=Math.max(.65,Math.min(1.8,zoom[i]-.12)));};
+  $('zoomOut').onclick=()=>{const ids=playerIndices();ids.forEach(i=>zoom[i]=Math.max(.65,Math.min(1.8,zoom[i]+.12)));};
+  $('zoomReset').onclick=()=>playerIndices().forEach(i=>zoom[i]=1);
+  addEventListener('wheel',e=>{if($('ov').style.display!=='none'){return;}const ids=playerIndices();const d=e.deltaY>0?.08:-.08;ids.forEach(i=>zoom[i]=Math.max(.65,Math.min(1.8,zoom[i]+d)));},{passive:true});
+  let pinch=0;
+  addEventListener('touchmove',e=>{if(e.touches.length!==2)return;const a=e.touches[0],b=e.touches[1],d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);if(pinch){const delta=(pinch-d)/300;playerIndices().forEach(i=>zoom[i]=Math.max(.65,Math.min(1.8,zoom[i]+delta));}pinch=d;},{passive:true});
+  addEventListener('touchend',e=>{if(e.touches.length<2)pinch=0;},{passive:true});
+  const mm=$('miniMap'),mx=mm.getContext('2d');
+  function drawMap(){
+    if(mm.style.display==='none')return;
+    mx.clearRect(0,0,240,240);mx.fillStyle='rgba(224,194,133,.75)';mx.fillRect(0,0,240,240);
+    mx.strokeStyle='rgba(80,50,20,.35)';for(let x=0;x<=240;x+=30){mx.beginPath();mx.moveTo(x,0);mx.lineTo(x,240);mx.stroke();}for(let y=0;y<=240;y+=30){mx.beginPath();mx.moveTo(0,y);mx.lineTo(240,y);mx.stroke();}
+    const sx=v=>120+v*1.05,sz=v=>120+v*1.05;
+    [[0,-34,'💧'],[DX,DZ,'👴'],[-22,64,'🐎'],[HX,HZ,'🦅'],[22,0,'⛺'],[-22,0,'⛺']].forEach(a=>{mx.font='18px sans-serif';mx.fillText(a[2],sx(a[0])-9,sz(a[1])+7);});
+    P.forEach((p,i)=>{if(gameMode!=='two'&&i!==activePlayer)return;mx.beginPath();mx.arc(sx(p.g.position.x),sz(p.g.position.z),7,0,Math.PI*2);mx.fillStyle=i?'#1769c2':'#c8102e';mx.fill();mx.fillStyle='#fff';mx.font='800 9px Cairo';mx.textAlign='center';mx.fillText(i?'ز':'ف',sx(p.g.position.x),sz(p.g.position.z)+3);});
+  }
+  const oldV2=v2;
+  v2=function(dt,now){oldV2(dt,now);drawMap();};
+  setMode('two');
+})();
+
 </script>
 </body>
 </html>
