@@ -127,7 +127,7 @@ addEventListener('resize',layout);layout();
 // day & night
 const KS=[[0,0x9ad4f0],[.55,0x7cc4ee],[.65,0xf0905a],[.74,0x1a2250],[.93,0x0b1330],[1,0x9ad4f0]];
 function skyAt(t){for(let i=1;i<KS.length;i++)if(t<=KS[i][0]){const a=KS[i-1],b=KS[i];return new THREE.Color(a[1]).lerp(new THREE.Color(b[1]),(t-a[0])/(b[0]-a[0]));}}
-const dayI=t=>t<.6?1:t<.72?1-(t-.6)/.12*.75:t<.93?.25:.25+(t-.93)/.07*.75;
+const dayI=t=>t<.6?1:t<.72?1-(t-.6)/.12*.75:t<.93 ? .25 : .25+(t-.93)/.07*.75;
 function step(p,i,dt){
  const k=p.k,hp=p.g.position,lock=p.busy||p.sit;
  let dx=lock?0:p.jx+(keys[k.r]?1:0)-(keys[k.l]?1:0),dz=lock?0:p.jz+(keys[k.d]?1:0)-(keys[k.u]?1:0);const l=Math.hypot(dx,dz);
@@ -313,7 +313,7 @@ const hs=HC.map((c,k)=>{const h=mkHorse(c[1]),j=mkPerson({th:0xffffff,c:'g',g1:'
 function raceQ(i){if(race.on&&race.t>2.5)return toast(i,'السباق جاري 🐎');open(i,'مَن يفوز؟ اختر الحصان',HC.map((c,k)=>[c[0],()=>{race.gu[i]=k;closeQ(i);if(!race.on){const w=R()*3|0;race.sp=[0,1,2].map(j=>5+R()+(j==w?1.3:0));race.on=1;race.t=0;race.x=[0,0,0];snd('hoof');}}]).concat([['✖',()=>closeQ(i)]]));}
 // الصيد
 const HX=60,HZ=24,PERCH=new V3(HX+8,1.9,HZ),fl2=[],bd=[];
-function mkBird(big){const g=new THREE.Group(),m=S(big?0x4a3626:0x8a7a66),w=big?1.4:.7,wL=M(new THREE.BoxGeometry(w,.05,.35),m,-w/2,0,0,g),wR=M(new THREE.BoxGeometry(w,.05,.35),m,w/2,0,0,g);M(new THREE.SphereGeometry(big?.28:.16,8,6),m,0,0,0,g).scale.set(1,.8,1.6);if(big)M(new THREE.SphereGeometry(.2,8,6),S(0xf0ece0),0,-.08,.12,g);scene.add(g);return{g,wL,wR};}
+function mkBird(big){const g=new THREE.Group(),m=S(big?0x4a3626:0x8a7a66),w=big?1.4:.7,wL=M(new THREE.BoxGeometry(w,.05,.35),m,-w/2,0,0,g),wR=M(new THREE.BoxGeometry(w,.05,.35),m,w/2,0,0,g);M(new THREE.SphereGeometry(big ? .28 : .16,8,6),m,0,0,0,g).scale.set(1,.8,1.6);if(big)M(new THREE.SphereGeometry(.2,8,6),S(0xf0ece0),0,-.08,.12,g);scene.add(g);return{g,wL,wR};}
 function lbl(b){if(b.lb)b.g.remove(b.lb);const c=LET.map(x=>x[0]).filter(c=>!bd.some(o=>o!==b&&o.w==c));b.w=pick(c);b.lb=label(b.w,'#3b2412');b.lb.scale.set(1.5,.6,1);b.lb.position.y=.9;b.g.add(b.lb);}
 for(let j=0;j<6;j++){const b=mkBird(0);Object.assign(b,{a:j*1.05,r:7+R()*8,h:6+R()*3,s:.35+R()*.2,state:'fly'});bd.push(b);lbl(b);}
 const fal=mkBird(1);fal.g.position.copy(PERCH);M(new THREE.CylinderGeometry(.1,.1,1.9,6),S(0x6b4a2a),HX+8,.95,HZ);
