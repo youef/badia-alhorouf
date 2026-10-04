@@ -2,7 +2,7 @@ export class BuildingSystem {
   constructor({storageKey='badia-buildings-v1',bounds={minX:-82,maxX:82,minZ:-82,maxZ:82},sizes={camp:8,majlis:7,sheepPen:7,camelPen:8,stable:9,palm:2.5,well:4}}={}) {
     this.storageKey=storageKey; this.bounds=bounds; this.sizes=sizes; this.items=this.load();
   }
-  load(){try{const x=JSON.parse(localStorage.getItem(this.storageKey)||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}}
+  load(){try{const x=JSON.parse(localStorage.getItem(this.storageKey)||'[]');if(!Array.isArray(x))return[];return x.filter(v=>v&&typeof v==='object'&&typeof v.id==='string'&&typeof v.type==='string'&&Number.isFinite(Number(v.x))&&Number.isFinite(Number(v.z))&&Number.isFinite(Number(v.r))).map(v=>({...v,x:Number(v.x),z:Number(v.z),r:Number(v.r),level:Number(v.level)||1,owner:Number(v.owner)||0}));}catch(e){return[]}}
   save(){try{localStorage.setItem(this.storageKey,JSON.stringify(this.items))}catch(e){}}
   serialize(){return this.items.map(x=>({...x}))}
   inside(x,z,r){return x-r>=this.bounds.minX&&x+r<=this.bounds.maxX&&z-r>=this.bounds.minZ&&z+r<=this.bounds.maxZ}
