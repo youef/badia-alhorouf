@@ -380,7 +380,7 @@ requestAnimationFrame(loop);
   $('zoomReset').onclick=()=>playerIndices().forEach(i=>zoom[i]=1);
   addEventListener('wheel',e=>{if($('ov').style.display!=='none'){return;}const ids=playerIndices();const d=e.deltaY>0 ? .08 : -.08;ids.forEach(i=>zoom[i]=Math.max(.65,Math.min(1.8,zoom[i]+d)));},{passive:true});
   let pinch=0;
-  addEventListener('touchmove',e=>{if(e.touches.length!==2)return;const a=e.touches[0],b=e.touches[1],d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);if(pinch){const delta=(pinch-d)/300;playerIndices().forEach(i=>zoom[i]=Math.max(.65,Math.min(1.8,zoom[i]+delta));}pinch=d;},{passive:true});
+  addEventListener('touchmove',e=>{if(e.touches.length!==2)return;const a=e.touches[0],b=e.touches[1],d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);if(pinch){const delta=(pinch-d)/300;playerIndices().forEach(i=>zoom[i]=Math.max(.65,Math.min(1.8,zoom[i]+delta)));}pinch=d;},{passive:true});
   addEventListener('touchend',e=>{if(e.touches.length<2)pinch=0;},{passive:true});
   const mm=$('miniMap'),mx=mm.getContext('2d');
   function drawMap(){
